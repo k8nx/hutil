@@ -1,5 +1,11 @@
 # hadoop utils
 
+## Install
+
+```shell
+$ easy_install https://github.com/dgkim84/hutil/archive/master.tar.gz
+```
+
 ## generating config files
 
 * XML로 설정 파일을 만드는 것은 귀찮으면서 각종 -site.xml 파일을 만들어야 한다.
