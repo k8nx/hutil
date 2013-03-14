@@ -45,9 +45,25 @@ Options:
   -o OUTFILE, --output=OUTFILE
                         output file
   --stdout              stdout
+  -i INDENT, --indent=INDENT
+                        indent length
+  -D DEFINE, --define=DEFINE
+                        define key and value pair
 ```
 
 ```shell
+$ hutil -Dfs.default.name=hdfs://localhost:9000 -i 2
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+<configuration>
+
+  <property>
+    <name>fs.default.name</name>
+    <value>hdfs://localhost:9000</value>
+  </property>
+
+</configuration>
+
 $ hutil -f sites.yaml -c core --stdout
 $ hutil -f sites.yaml -c core -o core-site.xml
 $ hutil -f sites.yaml -c core -o hdfs-site.xml

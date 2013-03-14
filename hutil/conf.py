@@ -49,8 +49,8 @@ class Configuration:
     except:
       pass
 
-  def generateAsXMLFile(self, output, extra=None):
-    value = self.generateAsXML(extra)
+  def generateAsXMLFile(self, output, extra=None, indent=2):
+    value = self.generateAsXML(extra=extra, indent=indent)
     try:
       f = file(output, "w")
       f.write(value)
@@ -73,7 +73,12 @@ class Configuration:
   def generateAsYAML(self, extra = None):
     return yaml.dump(self.copy(extra))
 
-  def generateAsXML(self, extra = None):
+  def generateAsXML(self, extra=None, indent=2):
+    try:
+      indent = abs(int(indent))
+    except:
+      indent = 2
+    (level1, level2) = (" " * indent, " " * indent * 2)
     ps = self.copy(extra)
 
     xml = """<?xml version="1.0"?>
@@ -86,11 +91,11 @@ class Configuration:
       if type(ps[name]) == list:
         ps[name] = ','.join([str(value) for value in ps[name]])
       xml += """
-  <property>
-    <name>%s</name>
-    <value>%s</value>
-  </property>
-"""%(name, ps[name])
+%s<property>
+%s<name>%s</name>
+%s<value>%s</value>
+%s</property>
+"""%(level1, level2, name, level2, ps[name], level1)
     xml += """
 </configuration>
 """

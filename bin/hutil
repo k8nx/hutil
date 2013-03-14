@@ -3,31 +3,52 @@ from hutil import Configuration
 
 import optparse
 
-parser = optparse.OptionParser()
+class MultipleOption(optparse.Option):
+  ACTIONS = optparse.Option.ACTIONS + ("extend",)
+  STORE_ACTIONS = optparse.Option.STORE_ACTIONS + ("extend",)
+  TYPED_ACTIONS = optparse.Option.TYPED_ACTIONS + ("extend",)
+  ALWAYS_TYPED_ACTIONS = optparse.Option.ALWAYS_TYPED_ACTIONS + ("extend",)
+
+  def take_action(self, action, dest, opt, value, values, parser):
+    if action == "extend":
+      values.ensure_value(dest, []).append(value)
+    else:
+      optparse.Option.take_action(self, action, dest, opt, value, values, parser)
+
+parser = optparse.OptionParser(option_class=MultipleOption)
 parser.add_option("-f", "--file", dest="infile", help="source configuration file")
 parser.add_option("-c", "--chroot", dest="chroot", help="change root (only *.yaml)")
 parser.add_option("-o", "--output", dest="outfile", help="output file")
-parser.add_option("--stdout", dest="stdout", action="store_true", default=False, help="stdout")
+parser.add_option("--stdout", dest="stdout", action="store_true", default=True, help="stdout")
+parser.add_option("-i", "--indent", dest="indent", help="indent length", default=2)
+parser.add_option("-D", "--define", dest="define", help="define key and value pair", action="extend")
 
 (options, args) = parser.parse_args()
 
-inXML = options.infile.endswith(".xml") if options.infile else False
+inXML = False
+inYML = False
+if options.infile is None:
+  inXML = options.infile.endswith(".xml") if options.infile else False
+  inYML = options.infile.endswith(".yaml") if options.infile else False
 outXML = not inXML
 
-if options.infile:
-  conf = Configuration()
-  if inXML:
-    conf.loadXML(options.infile)
-  else:
-    conf.loadYAML(options.infile, options.chroot)
+conf = Configuration()
+if inXML:
+  conf.loadXML(options.infile)
+elif inYML:
+  conf.loadYAML(options.infile, options.chroot)
 
-  if outXML:
-    if options.stdout is False and options.outfile:
-      conf.generateAsXMLFile(options.outfile)
-    else:
-      print conf.generateAsXML()
+if type(options.define) is list:
+  for value in options.define:
+    conf[value.split("=", 2)[0]] = value.split("=", 2)[1]
+
+if outXML:
+  if options.stdout is False and options.outfile:
+    conf.generateAsXMLFile(options.outfile)
   else:
-    if options.stdout is False and options.outfile:
-      conf.generateAsYAMLFile(options.outfile)
-    else:
-      print conf.generateAsYAML()
+    print conf.generateAsXML(indent=options.indent)
+else:
+  if options.stdout is False and options.outfile:
+    conf.generateAsYAMLFile(options.outfile)
+  else:
+    print conf.generateAsYAML()
