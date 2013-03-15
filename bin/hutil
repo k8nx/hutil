@@ -27,10 +27,12 @@ parser.add_option("-D", "--define", dest="define", help="define key and value pa
 
 inXML = False
 inYML = False
-if options.infile is None:
+if options.infile is not None:
   inXML = options.infile.endswith(".xml") if options.infile else False
   inYML = options.infile.endswith(".yaml") if options.infile else False
 outXML = not inXML
+if options.outfile is not None and options.outfile.endswith(".yaml") is False:
+  outXML = True
 
 conf = Configuration()
 if inXML:
@@ -43,12 +45,12 @@ if type(options.define) is list:
     conf[value.split("=", 2)[0]] = value.split("=", 2)[1]
 
 if outXML:
-  if options.stdout is False and options.outfile:
+  if options.outfile:
     conf.generateAsXMLFile(options.outfile)
   else:
     print conf.generateAsXML(indent=options.indent)
 else:
-  if options.stdout is False and options.outfile:
+  if options.outfile:
     conf.generateAsYAMLFile(options.outfile)
   else:
     print conf.generateAsYAML()
