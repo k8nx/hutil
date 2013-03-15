@@ -72,6 +72,8 @@ $ hutil -f sites.yaml -c mapred -o mapred-site.xml
 $ hutil -f sites.yaml -c core -o core-site.xml
 $ hutil -f core-site.xml -o core-site.yaml
 $ hutil -f core-site.yaml -o core-site.xml
+
+$ hutil -f core-site.xml -r -D fs.default.name="hdfs://hadoop1:9000"
 ```
 input이 yaml이면 xml이 결과로 나오고 xml이면 yaml이 결과로 나옵니다. yaml의 경우는 xml로 만들 때 root로 사용할 키를 지정할 수 있고 하나의 yaml로 여러 xml파일을 뽑아내기 위함입니다. (귀찮아서...)
 

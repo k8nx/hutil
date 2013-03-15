@@ -2,6 +2,7 @@
 from hutil import Configuration
 
 import optparse
+import datetime
 
 class MultipleOption(optparse.Option):
   ACTIONS = optparse.Option.ACTIONS + ("extend",)
@@ -22,6 +23,7 @@ parser.add_option("-o", "--output", dest="outfile", help="output file")
 parser.add_option("--stdout", dest="stdout", action="store_true", default=True, help="stdout")
 parser.add_option("-i", "--indent", dest="indent", help="indent length", default=2)
 parser.add_option("-D", "--define", dest="define", help="define key and value pair", action="extend")
+parser.add_option("-r", "--replace", dest="replace", help="", default=False, action="store_true")
 
 (options, args) = parser.parse_args()
 
@@ -30,6 +32,14 @@ inYML = False
 if options.infile is not None:
   inXML = options.infile.endswith(".xml") if options.infile else False
   inYML = options.infile.endswith(".yaml") if options.infile else False
+
+if options.replace is not False:
+  options.outfile = options.infile
+  f = file("%s.%s"%(options.infile, datetime.datetime.now().isoformat()), 'w')
+  f.write(open(options.infile).read())
+  f.flush()
+  f.close()
+
 outXML = not inXML
 if options.outfile is not None and options.outfile.endswith(".yaml") is False:
   outXML = True
